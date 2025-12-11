@@ -66,7 +66,10 @@ This repository exists to:
 The full implementation is private and under active development.
 
 ✅ License
-Apache 2.0 — open source intent confirmed.
+
+This project is released under the **CC BY-NC-SA 4.0** license.  
+Commercial use is strictly prohibited without prior written permission.  
+See [Creative Commons License](https://creativecommons.org/licenses/by-nc-sa/4.0/) for details.
 
 ✅ Author
 BlueScreen4 (Frozenheart Rhapael)
