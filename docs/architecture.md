@@ -1,23 +1,25 @@
-# Ouroboros Architecture Overview
+# Ouroboros Architecture — Historical Design Notes
 
-Ouroboros is a distributed inference framework designed to unify fragmented, underutilized hardware into a coherent compute pool.
+Original publication: December 11, 2025. Clarified: November 20, 2026.
 
-## Core Concepts
+The original version of this file described a decentralized approach to pooling fragmented, underutilized hardware. The historical README subsequently described centralized orchestration using a scheduler set. These descriptions conflict if treated as a single implemented architecture. This file preserves the former as a historical design alternative, not a confirmed feature or a claim that a transition was implemented.
 
-- **Node Types**: Supports smartphones, legacy desktops, edge devices, and GPUs.
-- **Trust-Based Scheduling**: Nodes are ranked by reliability, latency, and historical accuracy.
-- **Vendor-Neutral Execution**: Compatible with AMD, Intel, NVIDIA, and ARM-based systems.
-- **Decentralized Pooling**: No central coordinator; nodes self-organize and negotiate workloads.
+## Original decentralized proposal
 
-## Flow Overview
+- Candidate node types: smartphones, legacy desktops, edge devices and GPUs.
+- Intended trust-based ranking using reliability, latency and historical result accuracy.
+- Intended vendor-neutral execution across AMD, Intel, NVIDIA and ARM systems.
+- Proposed self-organizing resource pooling without a central coordinator.
+- Proposed flow: register nodes; broadcast tasks for voluntary claim; aggregate results using trust; optionally fall back to higher-performance nodes.
 
-1. Node registration with metadata (device type, compute score, trust level)
-2. Task broadcast and voluntary claim
-3. Trust-weighted result aggregation
-4. Optional fallback to high-performance nodes
+The public scheduler excerpt instead defines a scheduler object with a master identifier, an in-memory node map and candidate ranking. It does not demonstrate decentralized negotiation, trust-weighted result aggregation, cross-vendor runtime support, or a distributed shared-state scheduler cluster.
 
-## Deployment Targets
+## Historical centralized proposal
 
-- Edge clusters (IoT, smart cities)
-- On-premise enterprise servers
-- Hybrid consumer networks (home devices + old phones)
+The original README proposed a centralized orchestration pipeline with multiple scheduler instances, specialized model containers and tagged intermediate artifacts. See the [README](../README.md). The public excerpt is insufficient to establish statelessness, coordination, failover or production readiness.
+
+## Intended deployment targets
+
+Edge clusters, on-premises enterprise servers and hybrid consumer networks were proposed targets, not validated deployments.
+
+See [technical limitations](technical-limitations.md) for the observed implementation and evidence boundary. The original wording remains accessible in Git history.

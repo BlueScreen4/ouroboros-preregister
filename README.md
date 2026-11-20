@@ -1,82 +1,75 @@
-🌀 Ouroboros — Distributed Offload Inference Framework
-Pre‑registration & Technical Prior‑Art Declaration
-Ouroboros is a centralized, high‑performance offload inference system designed to orchestrate heterogeneous hardware — from smartphones to GPUs to modular AI accelerators — through a unified scheduling and container execution pipeline.
-This repository documents the author's early Ouroboros design, technical intent, and published scheduler implementation as of December 11, 2025. It records the project's own design history, not a claim to have invented multi-factor scheduling or distributed inference.
-The core implementation resides in a private development environment.
+# 🌀 Ouroboros — Distributed Offload Inference Framework
 
-**Scope:** The architecture below describes the original design proposal. It is not a statement that every component was implemented, validated, or remains part of the current system.
+**Historical technical disclosure / pre-registration — December 11, 2025**  
+**Editorial clarification — November 20, 2026**
 
-✅ Core Architecture Overview
-Ouroboros is built around a multi‑instance scheduler cluster that receives offloaded tasks from lightweight client models and dispatches them to specialized AI containers packaged in M.2 SSD modules.
-Key Components
-• 	phi‑3 mini Client Frontline
-Performs first‑pass inference. Offloads tasks it cannot handle.
-• 	Poison Protocol + gRPC + TLS 1.3
-Secure transport layer carrying structured metadata, offload flags, and execution context.
-• 	Mistral Interpreter Layer
-Converts natural‑language requests into structured task graphs and container chains.
-• 	Scheduler Set (MFPI‑Driven)
-Multi‑instance, stateless schedulers using a unified MFPI (Multi‑Factor Performance Index) score to select optimal nodes and containers.
-• 	M.2 AI Container Chain
-Specialized AI models packaged as hot‑swappable M.2 SSD modules.
-Automatically auto‑plug / auto‑unplug during execution.
-• 	Tagged Buffer Routing
-Intermediate results are tagged (, , ) and passed through a high‑speed buffer (RAM or dedicated SSD).
+This public repository preserves the author's early Ouroboros design and scheduler source. The proposed system aims to orchestrate heterogeneous computing resources, including mobile devices, desktops and accelerators, for offloaded AI tasks and specialized container execution.
 
-✅ Project-Specific Technical Design (Historical Disclosure)
-The following describes the intended resource-evaluation approach for Ouroboros. Multi-factor resource scoring, heterogeneous scheduling, and network- and power-aware offloading are established technical concepts.
-MFPI Hardware‑Aware Scoring
-The original MFPI design proposed a performance index incorporating:
-• 	PCIe lane count × PCIe generation bandwidth
-• 	Memory bandwidth (GB/s) normalization
-• 	Dynamic power states (charging vs battery)
-• 	RTT EMA (smoothed round-trip latency; not a direct jitter measurement)
-• 	Thermal / load factors
-• 	Container compatibility (CUDA/ROCm/NPU/ARC)
-The project-specific contribution documented here is the proposed choice and combination of metrics, scoring rules, node selection, and integration with the Ouroboros container execution pipeline. No claim is made that combining hardware, power, and network metrics is itself novel, or that this design is the first of its kind.
+This is an engineering design record, not a formal patent registration, scientific performance claim, or assertion that the underlying concepts were invented here. The original publication and subsequent corrections remain in Git history. The private implementation is outside the scope of this public repository.
 
-The published [`stc_scheduler.rs`](stc_scheduler.rs) records an early OPI implementation: a weighted hardware score adjusted for ROCm support, followed by RTT and load penalties and health-based exclusion. It is a heuristic, not an empirically calibrated performance model. The broader MFPI factors above describe design intent; the public code does not implement all of them (notably thermal and charging-state scoring). The public record does not establish comparative performance, patent novelty, or inventive step.
+## Scope and evidence
 
-✅ Execution Flow Summary
-1. 	User A → phi‑3 mini
-Client attempts local inference. If insufficient, marks request for offload.
-2. 	phi‑3 mini → Server
-Sends request via gRPC + TLS1.3 + Poison Protocol.
-3. 	Server → Mistral
-Mistral interprets the natural‑language request and generates a container execution plan.
-4. 	Mistral → Scheduler Set
-Schedulers evaluate MFPI scores and select nodes + container chain.
-5. 	Scheduler → M.2 Container Chain
-Containers auto‑plug/unplug in sequence.
-Each container attaches routing tags and throws results into the buffer.
-6. 	Final Container → Mistral
-Tagged result is returned to the interpreter.
-7. 	Mistral → User A
-Final output is delivered back through the secure channel.
+- The original architecture is a proposal. Features described below are intended capabilities unless explicitly identified as present in the published source.
+- The preserved [scheduler excerpt](stc_scheduler.rs) is an early, incomplete prototype, not a standalone buildable or validated inference framework.
+- No public benchmark dataset, controlled comparison, reproducible end-to-end test suite, security assessment, or hardware compatibility matrix accompanies this disclosure.
+- The initial [architecture notes](docs/architecture.md) described decentralized pooling, whereas the subsequent original README described centralized orchestration. These are historical design descriptions, not two simultaneously established properties of an implemented system.
+- For the exact published scoring rules and their limitations, see [Technical limitations and evidence status](docs/technical-limitations.md).
 
-✅ Deployment Model
-• 	Centralized orchestration with multi‑instance schedulers
-• 	Stateless scheduler nodes backed by shared state storage
-• 	High‑performance offload pipeline for heterogeneous hardware
-• 	Dynamic container chaining via modular M.2 accelerators
+## Original architecture proposal
 
-✅ Purpose of This Repository
-This repository exists to:
-• 	Preserve the author's original Ouroboros design and its publication history
-• 	Document the project-specific OPI/MFPI approach as a dated technical disclosure
-• 	Document the offload‑centric architecture
-• 	Record the proposed M.2 container chain execution model
-• 	Document the proposed Poison Protocol → Mistral → Scheduler Set pipeline
+| Component | Intended function |
+|---|---|
+| Phi-3 Mini client frontline | Attempt local inference and request offload when appropriate. |
+| Poison Protocol + gRPC + TLS 1.3 | Carry structured request metadata and context over a proposed TLS-protected transport. The additional protocol is not asserted to provide cryptographic security. |
+| Mistral interpreter | Translate requests into structured task plans and container chains. |
+| MFPI-driven scheduler set | Rank eligible nodes according to a proposed set of resource metrics; multiple scheduler instances and shared state were proposed, not demonstrated. |
+| M.2 AI container chain | Package specialized models in SSD-backed modules with dynamic activation and deactivation. Physical live M.2 insertion/removal, device-level hot-plug safety and reliable automatic unmounting are not demonstrated. |
+| Tagged buffer routing | Transfer intermediate artifacts between stages through proposed routing metadata and RAM or SSD-backed storage. Exact tag schemas, isolation and throughput are not established by the public excerpt. |
 
-**Editorial clarification (2026-11-20):** Earlier wording overstated the uniqueness of multi-factor scoring. This clarification narrows that claim without changing the original published scheduler code or rewriting the historical commits. See the [December 11, 2025 scheduler disclosure](https://github.com/BlueScreen4/ouroboros-preregister/commit/b380fd0cb0cf8726dfc80fd117e01edad300be1a).
-The full implementation is private and under active development.
+Model names and execution technologies above belong to the historical proposal, not a guarantee of current dependencies, performance or support.
 
-✅ License
+## OPI and MFPI resource evaluation
 
-This project is released under the **CC BY-NC-SA 4.0** license.  
-Commercial use is strictly prohibited without prior written permission.  
-See [Creative Commons License](https://creativecommons.org/licenses/by-nc-sa/4.0/) for details.
+Multi-factor resource scoring, heterogeneous scheduling, and network- and power-aware offloading are established technical approaches. The project-specific disclosure here consists of the author's proposed metric selection, scoring rules, node selection and integration with the proposed container execution pipeline.
 
-✅ Author
-BlueScreen4 (Frozenheart Rhapael)
+The original MFPI proposal contemplated PCIe capacity, memory bandwidth, power state, latency, thermal/load conditions and accelerator/runtime compatibility. The published code is narrower: it computes a weighted raw OPI score, adjusts it for ROCm availability, and applies network/load factors and health-state exclusions.
+
+The numeric coefficients, thresholds and backend preferences are provisional engineering heuristics, not measured performance ratios. Only the ROCm multiplier of 1.1 is present in this public excerpt; it does not establish a 10% speed advantage. Other backend multipliers are not established by this public code. RAM amount, PCIe generation number and compute-unit count are not directly interchangeable measures of inference throughput.
+
+No claim is made that these metrics, their combination, or the broader architecture are first-of-kind, globally optimal, or superior to existing approaches. Patent novelty, inventive step and comparative performance have not been established.
+
+## Proposed execution flow
+
+1. A lightweight client evaluates whether to request offload.
+2. The client sends a structured request to the server.
+3. An interpreter proposes a task plan and container sequence.
+4. The scheduler evaluates eligible resources and selects candidates according to its configured scoring policy.
+5. Specialized containers are intended to activate as needed and exchange intermediate artifacts through a tagged buffer.
+6. The final result is intended to return through the interpreter to the client.
+
+This sequence describes design intent. The public scheduler excerpt does not establish successful end-to-end execution, distributed sharding, inference, secure transport or orchestration.
+
+## Deployment intent
+
+Potential deployments included on-premises servers, heterogeneous edge clusters and hybrid consumer device pools. Vendor-neutral operation and efficient resource reuse were goals, not demonstrated compatibility or performance results.
+
+## Historical record and purpose
+
+The repository exists to preserve the author's dated technical disclosure, including the original scheduler and the proposed OPI/MFPI and modular execution architecture. It is not a claim of exclusive rights to general scheduling concepts or an independently certified priority date.
+
+- [Original scheduler publication commit, December 11, 2025](https://github.com/BlueScreen4/ouroboros-preregister/commit/b380fd0cb0cf8726dfc80fd117e01edad300be1a)
+- [Architecture notes](docs/architecture.md)
+- [Vision](docs/vision.md)
+- [Known technical limitations](docs/technical-limitations.md)
+- [Contribution policy](docs/contributing.md)
+
+**Editorial clarification (2026-11-20):** Earlier wording overstated uniqueness, implementation maturity and performance/security properties. This revision explicitly separates historical proposals, observable code behavior and unverified claims. The original scheduler bytes and Git history are preserved.
+
+## License
+
+The public materials in this repository are provided under the existing **CC BY-NC-SA 4.0** license, subject to its terms and applicable exceptions. See [LICENSE](LICENSE) and the [full legal text](https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode). This editorial revision does not relicense the material, establish patent rights, or change the terms of any private implementation.
+
+## Author
+
+BlueScreen4 (Frozenheart Rhapael)  
 Creator of the Ouroboros Offload Inference Framework
